@@ -13,11 +13,11 @@ class PostSerializer(ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     like_count = serializers.IntegerField(read_only=True)  # 캐시된 좋아요 수
     user = serializers.ReadOnlyField(source='user.username')  # 댓글 작성자 이름
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Comment
         fields = ['id', 'post', 'user', 'content', 'image', 'created_at', 'updated_at', 'like_count']
-
 
 class CommentLikeSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')

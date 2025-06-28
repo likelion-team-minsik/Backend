@@ -1,7 +1,7 @@
-from posts.serializers import PostSerializer
+from community.serializers import PostSerializer
 import re
 from rest_framework import serializers
-from posts.models import Post
+from community.models import Post
 
 class HighlightPostSerializer(serializers.ModelSerializer):
     highlighted_title   = serializers.SerializerMethodField()
