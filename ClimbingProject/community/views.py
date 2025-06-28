@@ -27,7 +27,7 @@ class PostViewSet(ModelViewSet):
         else: #이미 스크랩 됨
             return Response({'status': 'already scrapped'}, status=status.HTTP_200_OK)
 
-    #스크랩 취소
+    #스크랩 취소 
     @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])
     def unscrap(self, request, pk=None):
         post = self.get_object()
@@ -38,6 +38,30 @@ class PostViewSet(ModelViewSet):
             return Response({'status': 'unscrapped'}, status=status.HTTP_204_NO_CONTENT)
         except PostScrap.DoesNotExist:
             return Response({'status': 'not scrapped'}, status=status.HTTP_400_BAD_REQUEST)
+
+    #스크랩한 글
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_scraps(self, request):
+        user = request.user
+        scraps = PostScrap.objects.filter(user=user).select_related('post')
+        posts = [scrap.post for scrap in scraps]
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data)
+
+    #작성한 글
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_posts(self, request):
+        user = request.user
+        posts = Post.objects.filter(writer=user).order_by('-created_at')
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data)
+
+    #댓글 단 글
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_comments(self, request):
+        posts = Post.objects.filter(comments__user=request.user).distinct().order_by('-created_at')
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data)
 
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
@@ -53,9 +77,9 @@ class CommentViewSet(ModelViewSet):
         post = get_object_or_404(Post, pk=post_id)
         serializer.save(user=self.request.user, post=post)
 
-    #좋아요
+    #좋아요 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
-    def like(self, request, pk=None):
+    def like(self, request, post_pk=None, pk=None):
         comment = self.get_object()
         user = request.user
         like, created = CommentLike.objects.get_or_create(comment=comment, user=user)
@@ -66,9 +90,9 @@ class CommentViewSet(ModelViewSet):
         else: #이미 좋아요 눌려있음
             return Response({'status': 'already liked'}, status=status.HTTP_200_OK)
 
-    #좋아요 취소
+    #좋아요 취소 
     @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])
-    def unlike(self, request, pk=None):
+    def unlike(self, request, post_pk=None, pk=None):
         comment = self.get_object()
         user = request.user
         try:
