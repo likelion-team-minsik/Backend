@@ -5,10 +5,18 @@ from django.contrib.auth.models import User
 
 class PostSerializer(ModelSerializer):
     writer = serializers.ReadOnlyField(source = 'writer.username')
+    comment_count = serializers.SerializerMethodField() #게시글의 댓글 개수
+    like_count = serializers.SerializerMethodField() #게시글의 좋아요 개수
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'image', 'writer']
+        fields = ['id', 'title', 'content', 'image', 'writer', 'comment_count', 'like_count']
+    
+    def get_comment_count(self, obj):
+        return obj.comments.count()
+
+    def get_like_count(self, obj):
+        return obj.likes.count()
 
 class CommentSerializer(serializers.ModelSerializer):
     like_count = serializers.IntegerField(read_only=True)  # 캐시된 좋아요 수
