@@ -5,13 +5,19 @@ from django.conf import settings
 #커뮤니티 게시글
 class Post(models.Model):
     title = models.CharField(verbose_name="제목", max_length=100)
-    content = models.TextField(verbose_name="내용")
-    image = models.ImageField(verbose_name="이미지", upload_to='community/images/', null=True, blank=True)
+    content = models.TextField(verbose_name="내용", max_length=300)
+    # image = models.ImageField(verbose_name="이미지", upload_to='community/images/', null=True, blank=True)
     created_at = models.DateTimeField(verbose_name="작성일", auto_now_add=True)
-    writer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True) 
+    writer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    like_count = models.PositiveIntegerField(verbose_name="좋아요 수", default=0)
     
     def __str__(self):
         return self.title
+
+#커뮤니티 게시글 다중 이미지
+class PostImage(models.Model):
+    post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(verbose_name="이미지", upload_to='community/images/', null=True, blank=True)
 
 #커뮤니티 게시글 좋아요
 class PostLike(models.Model):
@@ -22,6 +28,18 @@ class PostLike(models.Model):
     class Meta:
         unique_together = ('post', 'user') #유저 게시글에 좋아요 한 개만 가능
 
+#게시글 스크랩
+class PostScrap(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='scraps')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('post', 'user')  # 중복 스크랩 방지
+
+    def __str__(self):
+        return f'{self.user.username} scrapped post {self.post.title}'
+        
 #게시글 댓글
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments') #어떤 게시글에 달린 댓글인지
@@ -47,14 +65,3 @@ class CommentLike(models.Model):
     def __str__(self):
         return f'{self.user.username} likes comment {self.comment.id}'
 
-#게시글 스크랩
-class PostScrap(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='scraps')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('post', 'user')  # 중복 스크랩 방지
-
-    def __str__(self):
-        return f'{self.user.username} scrapped post {self.post.title}'
