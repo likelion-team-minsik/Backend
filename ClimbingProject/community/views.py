@@ -5,19 +5,19 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.shortcuts import get_object_or_404
 
-from .models import Post, Comment, CommentLike, PostScrap
+from .models import Post, PostLike, Comment, CommentLike, PostScrap
 from .serializers import PostSerializer , CommentSerializer, CommentLikeSerializer
 
 class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly] #비로그인자는 GET만 조회 가능
 
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
     #스크랩
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated]) #로그인 필요
     def scrap(self, request, pk=None):
         post = self.get_object()
         user = request.user
@@ -28,7 +28,7 @@ class PostViewSet(ModelViewSet):
             return Response({'status': 'already scrapped'}, status=status.HTTP_200_OK)
 
     #스크랩 취소 
-    @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated]) #로그인 필요
     def unscrap(self, request, pk=None):
         post = self.get_object()
         user = request.user
@@ -40,7 +40,7 @@ class PostViewSet(ModelViewSet):
             return Response({'status': 'not scrapped'}, status=status.HTTP_400_BAD_REQUEST)
 
     #스크랩한 글
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated]) #로그인 필요
     def my_scraps(self, request):
         user = request.user
         scraps = PostScrap.objects.filter(user=user).select_related('post')
@@ -49,7 +49,7 @@ class PostViewSet(ModelViewSet):
         return Response(serializer.data)
 
     #작성한 글
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated]) #로그인 필요
     def my_posts(self, request):
         user = request.user
         posts = Post.objects.filter(writer=user).order_by('-created_at')
@@ -57,11 +57,38 @@ class PostViewSet(ModelViewSet):
         return Response(serializer.data)
 
     #댓글 단 글
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated]) #로그인 필요
     def my_comments(self, request):
         posts = Post.objects.filter(comments__user=request.user).distinct().order_by('-created_at')
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data)
+
+    #좋아요 
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def like(self, request, post_pk=None, pk=None):
+        post = self.get_object()
+        user = request.user
+        like, created = PostLike.objects.get_or_create(post=post, user=user)
+        if created: 
+            post.like_count = post.likes.count()
+            post.save(update_fields=['like_count'])
+            return Response({'status': 'liked'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'status': 'already liked'}, status=status.HTTP_200_OK)
+
+    #좋아요 취소 
+    @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])
+    def unlike(self, request, post_pk=None, pk=None):
+        post = self.get_object()
+        user = request.user
+        try:
+            like = PostLike.objects.get(post=post, user=user)
+            like.delete()
+            post.like_count = post.likes.count()
+            post.save(update_fields=['like_count'])
+            return Response({'status': 'unliked'}, status=status.HTTP_204_NO_CONTENT)
+        except PostLike.DoesNotExist:
+            return Response({'status': 'not liked'}, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
