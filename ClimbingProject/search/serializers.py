@@ -11,7 +11,7 @@ class HighlightPostSerializer(serializers.ModelSerializer):
         model  = Post
         fields = ['id', 'highlighted_title', 'highlighted_content', 'created_at']
 
-    # ---------- 하이라이트 ----------
+    #하이라이트
     def _highlight(self, text, keyword):
         """
         keyword(대소문자 무시)가 text에 있을 때 <mark>…</mark> 로 감싸서 반환

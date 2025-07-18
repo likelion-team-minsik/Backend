@@ -12,7 +12,7 @@ from .serializers import UserProfileSerializer
 User = get_user_model()                   
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()            # 커스텀 User 레코드 전체
+    queryset = User.objects.all()           
     serializer_class = UserSerializer
 
 class UserProfileView(APIView):
