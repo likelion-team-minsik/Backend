@@ -1,0 +1,237 @@
+[
+  {
+    "model": "analyzer.question",
+    "pk": 1,
+    "fields": {
+      "text": "Q1. 친구가 클라이밍 하자고 할 때 나는?"
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 1,
+    "fields": {
+      "question": 1,
+      "text": "친구랑 같이 가서 응원하고 분위기 즐기고 싶어",
+      "type": "응원형",
+      "score": 1
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 2,
+    "fields": {
+      "question": 1,
+      "text": "도전해보고 싶다! 어떻게 하는지 궁금해",
+      "type": "도전형",
+      "score": 2
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 3,
+    "fields": {
+      "question": 1,
+      "text": "오, 한 번 가볼까? 재밌겠다!",
+      "type": "재미형",
+      "score": 3
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 4,
+    "fields": {
+      "question": 1,
+      "text": "클라이밍? 규칙이 뭔데? 미리 알려줘",
+      "type": "계획형",
+      "score": 4
+    }
+  },
+  {
+    "model": "analyzer.question",
+    "pk": 2,
+    "fields": {
+      "text": "Q2. 클라이밍을 처음 시작한다면?"
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 5,
+    "fields": {
+      "question": 2,
+      "text": "일단 해보는 거야! 하다보면 적응하겠지",
+      "type": "도전형",
+      "score": 3
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 6,
+    "fields": {
+      "question": 2,
+      "text": "즐기면서 안전하게 체험하고 싶다",
+      "type": "재미형",
+      "score": 1
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 7,
+    "fields": {
+      "question": 2,
+      "text": "조금 걱정되는데 ... 친구 있으니까 괜찮겠지?",
+      "type": "응원형",
+      "score": 4
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 8,
+    "fields": {
+      "question": 2,
+      "text": "유X브에서 영상 보고 가야지",
+      "type": "계획형",
+      "score": 2
+    }
+  },
+  {
+    "model": "analyzer.question",
+    "pk": 3,
+    "fields": {
+      "text": "Q3. 첫 클라이밍 날, 내 자세는?"
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 9,
+    "fields": {
+      "question": 3,
+      "text": "(등반하는 친구를 보며) “나이스~!” 외침",
+      "type": "응원형",
+      "score": 2
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 10,
+    "fields": {
+      "question": 3,
+      "text": "(두리번 두리번) 사람 구경하며 등반 즐김",
+      "type": "재미형",
+      "score": 4
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 11,
+    "fields": {
+      "question": 3,
+      "text": "(손에 초크 묻히며) “간다!!”",
+      "type": "도전형",
+      "score": 1
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 12,
+    "fields": {
+      "question": 3,
+      "text": "(어떻게 오를지 관찰중) 이렇게 올라야지",
+      "type": "계획형",
+      "score": 3
+    }
+  },
+  {
+    "model": "analyzer.question",
+    "pk": 4,
+    "fields": {
+      "text": "Q4. 클라이밍 중간 쉬는 시간엔?"
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 13,
+    "fields": {
+      "question": 4,
+      "text": "(김치) 수다 떨면서 사진 타임",
+      "type": "재미형",
+      "score": 2
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 14,
+    "fields": {
+      "question": 4,
+      "text": "쉬면서 다른 사람들 등반을 분석함",
+      "type": "계획형",
+      "score": 1
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 15,
+    "fields": {
+      "question": 4,
+      "text": "친구를 보며 “조금만 더 힘내!”",
+      "type": "응원형",
+      "score": 3
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 16,
+    "fields": {
+      "question": 4,
+      "text": "휴식은 없다. 남은 체력으로 계속 도전중",
+      "type": "도전형",
+      "score": 4
+    }
+  },
+  {
+    "model": "analyzer.question",
+    "pk": 5,
+    "fields": {
+      "text": "Q5. 내려온 후 든 생각은?"
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 17,
+    "fields": {
+      "question": 5,
+      "text": "다음엔 저 벽부터 공략해야지",
+      "type": "계획형",
+      "score": 3
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 18,
+    "fields": {
+      "question": 5,
+      "text": "아 나 이거 잘하면 완등하겠는데?",
+      "type": "도전형",
+      "score": 1
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 19,
+    "fields": {
+      "question": 5,
+      "text": "응원 열심히 했네 ... 이제 집 가자!",
+      "type": "응원형",
+      "score": 2
+    }
+  },
+  {
+    "model": "analyzer.choice",
+    "pk": 20,
+    "fields": {
+      "question": 5,
+      "text": "힘들지만 즐거운 경험이었어",
+      "type": "재미형",
+      "score": 4
+    }
+  }
+]

@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('search/', include('search.urls')),
     path('', include('community.urls')),
+    path('', include('analyzer.urls')),
     path('', include('qna.urls')),
 ]
 
