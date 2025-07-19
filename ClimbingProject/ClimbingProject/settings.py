@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'search',
     'community',
     'qna',
+    'analyzer',
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'  # 커스텀 유저 모델 사용 시
