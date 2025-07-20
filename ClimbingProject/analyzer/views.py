@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from collections import defaultdict
 from .models import Choice, TestResult, Question
 from rest_framework.generics import ListAPIView
@@ -12,14 +12,12 @@ from .serializers import QuestionSerializer, TestResultSerializer
 class QuestionListView(APIView):
     def get(self, request):
         questions = Question.objects.prefetch_related('choices').all()
-        print("✅ questions:", questions)
         serializer = QuestionSerializer(questions, many=True)
-        print("✅ serializer data:", serializer.data)
         return Response(serializer.data)
 
 #선택한 답변 계산, 유형 분석, 결과 db저장
 class SubmitTestView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
         answers = request.data.get("answers", [])
@@ -39,12 +37,20 @@ class SubmitTestView(APIView):
         # 최고 점수인 유형 결정
         result_type = max(type_scores.items(), key=lambda x: x[1])[0]
 
-        # 결과 저장 (선택)
-        TestResult.objects.create(
-            user=request.user,
-            result_type=result_type,
-            scores=dict(type_scores)
-        )
+        # 결과 저장
+        #회원가입 유저일 때: DB저장
+        if request.user.is_authenticated:
+            TestResult.objects.create(
+                user=request.user,
+                result_type=result_type,
+                scores=dict(type_scores)
+            )
+        else:
+            #비로그인 유저일 때: 세션 저장
+            request.session['last_test_result'] = {
+                "result_type": result_type,
+                "score_details": dict(type_scores)
+            }
 
         return Response({
             "result_type": result_type,
@@ -57,8 +63,18 @@ class QuestionListAPIView(ListAPIView):
 
 #분석 결과 불러오기
 class MyTestResultsView(ListAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = TestResultSerializer
 
-    def get_queryset(self):
-        return TestResult.objects.filter(user=self.request.user).order_by('-created_at')
+    def get(self, request):
+        if request.user.is_authenticated:
+            results = TestResult.objects.filter(user=request.user).order_by('-created_at')
+            serializer = TestResultSerializer(results, many=True)
+            return Response(serializer.data)
+
+        # 세션에 저장된 결과 반환 (비로그인 사용자)
+        last_result = request.session.get('last_test_result')
+        if last_result:
+            return Response([last_result])  # 리스트 형태로 맞춤
+        else:
+            return Response({"detail": "저장된 결과가 없습니다."}, status=404)
