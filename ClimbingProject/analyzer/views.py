@@ -68,13 +68,16 @@ class MyTestResultsView(ListAPIView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            results = TestResult.objects.filter(user=request.user).order_by('-created_at')
-            serializer = TestResultSerializer(results, many=True)
-            return Response(serializer.data)
+            latest_result = TestResult.objects.filter(user=request.user).order_by('-created_at').first()
+            if latest_result:
+                serializer = TestResultSerializer(latest_result)
+                return Response(serializer.data)
+            else:
+                return Response({"detail": "결과가 없습니다."}, status=404)
 
-        # 세션에 저장된 결과 반환 (비로그인 사용자)
+        # 비로그인 사용자용 - 세션에서 가져오기
         last_result = request.session.get('last_test_result')
         if last_result:
-            return Response([last_result])  # 리스트 형태로 맞춤
+            return Response(last_result)  # 리스트 아님
         else:
             return Response({"detail": "저장된 결과가 없습니다."}, status=404)
