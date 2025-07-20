@@ -5,27 +5,39 @@ from community.serializers import PostSerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 from django.db.models import Q
 from .serializers import HighlightPostSerializer 
-
-class PostSearchView(generics.ListAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields   = ['title', 'content']   
+from rest_framework.permissions import IsAuthenticated
 
 class PostSearchView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]  
 
     def get(self, request):
+        user = request.user
         keyword = request.query_params.get('q', '').strip()
         qs = Post.objects.none()
 
         if keyword:
             qs = Post.objects.filter(
+                Q(writer=user),
                 Q(title__icontains=keyword) | Q(content__icontains=keyword)
             ).order_by('-created_at')
 
-        data = HighlightPostSerializer(qs, many=True, context={'keyword': keyword}).data
-        return Response(data)
+        serializer = PostSerializer(qs, many=True)
+        return Response(serializer.data)
+    
+class CommentedPostSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        keyword = request.query_params.get('q', '').strip()
+        qs = Post.objects.filter(comments__user=user).distinct().order_by('-created_at')
+
+        if keyword:
+            qs = qs.filter(
+                Q(title__icontains=keyword) | Q(content__icontains=keyword)
+            )
+
+        serializer = PostSerializer(qs, many=True)
+        return Response(serializer.data)
